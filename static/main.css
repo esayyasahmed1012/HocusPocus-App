@@ -1,0 +1,136 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+.home-container{
+    max-width: 800px;
+    margin: 100px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+.login-container {
+    width: 300px;
+    margin: 100px auto;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+.container {
+    width: 400px;
+    margin: 50px auto;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+    width: calc(100% - 20px);
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+.login-section, .signup-section {
+    flex-basis: 45%;
+}
+.login-section p, .signup-section p{
+    margin-left: 10px;
+}
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Social media registration */
+/* Social media registration */
+.social-registration {
+    margin-top: 20px;
+    text-align: center; /* Center the social media icons */
+}
+
+.social-icons {
+    display: flex; /* Use flexbox for horizontal layout */
+    justify-content: center; /* Center the icons horizontally */
+    padding: 0; /* Remove default padding */
+    margin: 0; /* Remove default margin */
+}
+
+.social-icon {
+    margin: 0 10px; /* Add space between icons if needed */
+}
+
+.social-icon a {
+    display: flex; /* Use flexbox to center the icon vertically */
+    justify-content: center; /* Center the icon horizontally */
+    align-items: center; /* Center the icon vertically */
+    width: 40px; /* Set width of each icon container */
+    height: 40px; /* Set height of each icon container */
+    border-radius: 50%; /* Make the container round */
+    background-color: #ccc; /* Optional background color */
+}
+
+.social-icon i {
+    color: #333; /* Set color of the icon */
+    font-size: 20px; /* Set size of the icon */
+    transition: color 0.3s; /* Add transition effect for color change on hover */
+}
+
+.social-icon:hover i {
+    color: #007bff; /* Change color on hover */
+}
+
+
+main {
+    display: flex;
+    justify-content: space-between;
+}
+
+.login-section, .signup-section {
+    flex-basis: 45%;
+}
+
+
+
+
+
+
+
+
+
+
