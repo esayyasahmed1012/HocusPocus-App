@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twitter</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}"> 
+</head>
+<body>
+    <div class="home-container">
+        <header>
+            <h1>Welcome to Twitter</h1>
+            <p>Please sign in or create an account</p>
+        </header>
+        <main>
+            <section class="login-section">
+                <h2>Login</h2>
+                    <p>already have an account?</p>
+                    <button onclick=location.href='{{ url_for('login') }}'>Login</button>
+            </section>
+            <section class="signup-section">
+                <h2>Sign Up</h2>
+                <p>New to our website? Create an account now!</p>
+                <button onclick=location.href='{{ url_for('register') }}'>Register</button>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
+
