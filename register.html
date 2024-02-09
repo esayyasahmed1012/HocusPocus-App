@@ -10,7 +10,7 @@
 </head>
 <body>
     <div class="container">
-        <form action="/register" method="POST">
+        <form id="registration-form" action="/register" method="POST">
             <h2>Create Account</h2>
             <div class="form-group">
                 <label for="username">Username</label>
@@ -28,24 +28,30 @@
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" required>
             </div>
-            <button onclick=location.href='{{ url_for('home') }}'>Sign Up</button>
-        </form>
-        <!-- Social media registration options -->
-        <div class="social-registration">
-            <small>Sign Up with Social Media</small>
-            <div class="social-icons">
-                <a href="#" class="social-icon facebook"><i class="fab fa-facebook-f"></i></a>
-                <a href="#" class="social-icon twitter"><i class="fab fa-twitter"></i></a>
-                <a href="#" class="social-icon google"><i class="fab fa-google"></i></a>
-                <!-- Add more social media icons as needed -->
-            </div>
+            <button type="submit">Sign Up</button>
             <div class="border-top pt-3">
                 <small class="text-muted">
-                    Already have account? <a class="ml-2" href="{{ url_for('home') }}">Login</a>
+                    have an account <a class="ml-2" href="{{ url_for('home') }}">Login</a>
                 </small>
             </div>
-        </div>
+        </form>
     </div>
+    <script>
+        document.getElementById('submit-btn').addEventListener('click', function(event) {
+            var username = document.getElementById('username').value;
+            var fullname = document.getElementById('fullname').value;
+            var email = document.getElementById('email').value;
+            var password = document.getElementById('password').value;
+    
+            if (!username || !fullname || !email || !password) {
+                alert('Please fill in all required fields.');
+                return false; // Prevent form submission
+            } else {
+                document.getElementById('registration-form').submit(); // Submit the form
+            }
+        });
+    </script>
+    
 </body>
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
