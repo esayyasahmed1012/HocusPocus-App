@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twitter</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f8fa;
+        }
+
+        nav {
+            background-color: #f5f8fa;
+            padding: 10px;
+            width: 60px; /* Adjust width as needed */
+            float: left;
+            position: fixed;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .tab {
+            display: block;
+            margin-bottom: 10px;
+            padding: 10px;
+            text-align: center;
+            background-color: white;
+            color: #1da1f2;
+            text-decoration: none;
+            border-left: 4px solid transparent;
+        }
+
+        .tab.active {
+            border-left: 4px solid #1da1f2;
+        }
+
+        .content {
+            margin-left: 80px; /* Adjust as needed to match nav width */
+            padding: 20px;
+        }
+
+        /* Example styles for different tabs */
+        #home-content {
+            display: block;
+        }
+
+        #explore-content,
+        #notifications-content,
+        #messages-content,
+        #profile-content,
+        #post-content {
+            display: none;
+        }
+
+        /* Example styling for each tab */
+        .tweet {
+            background-color: white;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .tweet p {
+            margin: 0;
+        }
+
+        .tweet-author {
+            font-weight: bold;
+        }
+
+        .tweet-content {
+            margin-top: 5px;
+        }
+
+        /* Add more styles as needed */
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="#home" class="tab active" onclick="openTab('home')"><i class="fas fa-home"></i></a>
+        <a href="#explore" class="tab" onclick="openTab('explore')"><i class="fas fa-compass"></i></a>
+        <a href="#notifications" class="tab" onclick="openTab('notifications')"><i class="fas fa-bell"></i></a>
+        <a href="#messages" class="tab" onclick="openTab('messages')"><i class="fas fa-envelope"></i></a>
+        <a href="#profile" class="tab" onclick="openTab('profile')"><i class="fas fa-user"></i></a>
+        <a href="#post" class="tab" onclick="openTab('post')"><i class="fas fa-pencil-alt"></i></a>
+    </nav>
+
+    <div class="content" id="home-content">
+        <h2>Home</h2>
+        <!-- Home content goes here -->
+    </div>
+
+    <div class="content" id="explore-content">
+        <h2>Explore</h2>
+        <!-- Explore content goes here -->
+    </div>
+
+    <div class="content" id="notifications-content">
+        <h2>Notifications</h2>
+        <!-- Notifications content goes here -->
+    </div>
+
+    <div class="content" id="messages-content">
+        <h2>Messages</h2>
+        <!-- Messages content goes here -->
+    </div>
+
+    <div class="content" id="profile-content">
+        <h2>Profile</h2>
+        <!-- Profile content goes here -->
+    </div>
+
+    <div class="content" id="post-content">
+        <h2>Post</h2>
+        <!-- Post content goes here -->
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+    <script>
+        function openTab(tabName) {
+            var i, tabContent, tabLinks;
+            tabContent = document.getElementsByClassName("content");
+            for (i = 0; i < tabContent.length; i++) {
+                tabContent[i].style.display = "none";
+            }
+            tabLinks = document.getElementsByClassName("tab");
+            for (i = 0; i < tabLinks.length; i++) {
+                tabLinks[i].classList.remove("active");
+            }
+            document.getElementById(tabName + "-content").style.display = "block";
+            document.querySelector('a[href="#' + tabName + '"]').classList.add("active");
+        }
+    </script>
+</body>
+</html>
