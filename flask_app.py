@@ -1,6 +1,7 @@
 from flask import Flask, request, redirect, render_template, url_for
 from flask_login import LoginManager, login_user, logout_user, current_user, login_required, UserMixin
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import check_password_hash
 from dotenv import load_dotenv
 import os
 
@@ -37,9 +38,6 @@ def load_user(user_id):
     # Example: Load user from a database using the provided user_id
     return User(user_id)
 
-@app.route("/")
-def home():
-    return render_template("home.html")
 
 @app.route("/register", methods=["POST", "GET"])
 def register():
@@ -58,10 +56,31 @@ def register():
             new_user = UserModel(username=username, fullname=fullname, email=email, password=password)
             db.session.add(new_user)
             db.session.commit()
-            return "User registered successfully!"
+            return redirect(url_for("home"))
+    return render_template("register.html")
+    
+@app.route("/", methods=["GET", "POST"])
+def home():
+    if request.method == "POST":
+        email = request.form.get("email")
+        password = request.form.get("password")
 
-    # Render the register.html template for GET requests
-    return render_template('register.html')
+        user = UserModel.query.filter_by(email=email).first()
+
+        if user and check_password_hash(user.password, password):
+            # Password is correct, log the user in
+            login_user(user)
+            # Redirect to a protected route after successful login
+            return redirect(url_for("dashboard"))
+        else:
+            # Incorrect email or password, handle authentication failure
+            error_message = "Invalid email or password. Please try again."
+            return render_template("home.html", error_message=error_message)
+    return render_template("home.html")
+
+@app.route('/dashboard', methods=["GET", "POST"])
+def dashboard():
+    return render_template("dashbord.html")
 
 if __name__ == "__main__":
     with app.app_context():
