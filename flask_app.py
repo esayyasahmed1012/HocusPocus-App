@@ -1,11 +1,12 @@
-from flask import Flask, request, redirect, render_template, url_for
+from flask import Flask, request, redirect, render_template, url_for, render_template_string
 from flask_login import LoginManager, login_user, logout_user, current_user, login_required, UserMixin
 from flask_sqlalchemy import SQLAlchemy
-from werkzeug.security import check_password_hash
-from dotenv import load_dotenv
+from sqlalchemy.exc import IntegrityError
+import bcrypt
 import os
 
 app = Flask(__name__)
+app.config['SECRET_KEY']='efaf54030445f83f13a6732ee4b88c38'
 # app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DEV_DATABASE_URI')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:Xas#123ad@localhost/my_storage'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -14,7 +15,7 @@ db = SQLAlchemy(app)
 
 login_manager = LoginManager(app)
 
-class UserModel(db.Model):
+class UserModel(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
     fullname = db.Column(db.String(100), nullable=False)
@@ -39,6 +40,8 @@ def load_user(user_id):
     return User(user_id)
 
 
+
+
 @app.route("/register", methods=["POST", "GET"])
 def register():
     if request.method == "POST":
@@ -46,19 +49,38 @@ def register():
         fullname = request.form.get('fullname')
         email = request.form.get('email')
         password = request.form.get('password')
+        password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt(14))
 
         if not (fullname and username and email and password):
             error_message = 'All fields are required.'
             return render_template('register.html', error_message=error_message)
         else:
-            print(f"Username: {username}, Full Name: {fullname}, Email: {email}, Password: {password}")
+            # Check if the email or username already exists in the database
+            existing_user_email = UserModel.query.filter_by(email=email).first()
+            existing_user_username = UserModel.query.filter_by(username=username).first()
 
-            new_user = UserModel(username=username, fullname=fullname, email=email, password=password)
-            db.session.add(new_user)
-            db.session.commit()
-            return redirect(url_for("home"))
+            if existing_user_email:
+                error_message = 'Email address is already in use.'
+                return render_template('register.html', error_message=error_message)
+            elif existing_user_username:
+                error_message = 'Username is already taken.'
+                return render_template('register.html', error_message=error_message)
+            else:
+                new_user = UserModel(username=username, fullname=fullname, email=email, password=password_hash)
+                db.session.add(new_user)
+                try:
+                    db.session.commit()
+                    return redirect(url_for("home"))
+                except IntegrityError as e:
+                    db.session.rollback()
+                    error_message = 'An error occurred while registering the user: ' + str(e)
+                    return render_template('register.html', error_message=error_message)
+
     return render_template("register.html")
+
     
+
+
 @app.route("/", methods=["GET", "POST"])
 def home():
     if request.method == "POST":
@@ -67,21 +89,31 @@ def home():
 
         user = UserModel.query.filter_by(email=email).first()
 
-        if user and check_password_hash(user.password, password):
+        if user and bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
             # Password is correct, log the user in
             login_user(user)
             # Redirect to a protected route after successful login
+            login_user(user)
             return redirect(url_for("dashboard"))
+            
         else:
             # Incorrect email or password, handle authentication failure
             error_message = "Invalid email or password. Please try again."
             return render_template("home.html", error_message=error_message)
     return render_template("home.html")
 
-@app.route('/dashboard', methods=["GET", "POST"])
-def dashboard():
-    return render_template("dashbord.html")
+def get_initials(fullname):
+    names = fullname.split()
+    initials = "".join(name[0].upper() for name in names)
+    return initials
 
+app.jinja_env.filters['initials'] = get_initials
+@app.route('/dashboard', methods=["GET", "POST"])
+@login_required
+def dashboard():
+    user = UserModel.query.get(current_user.id)
+    fullname = user.fullname
+    return render_template("dashboard.html",fullname=fullname)
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
