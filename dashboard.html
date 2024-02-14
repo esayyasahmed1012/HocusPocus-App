@@ -16,8 +16,7 @@
         nav {
             background-color: #f5f8fa;
             padding: 10px;
-            width: 60px; /* Adjust width as needed */
-            float: left;
+            width: 80px; /* Adjust width for mobile */
             position: fixed;
             height: 100%;
             overflow-y: auto;
@@ -39,12 +38,14 @@
         }
 
         .content {
-            margin-left: 80px; /* Adjust as needed to match nav width */
+            margin-left: 100px; /* Adjust as needed to match nav width */
             padding: 20px;
         }
 
         /* Example styles for different tabs */
-        #home-content {
+        #home-content,
+        #feed-content,
+        #news-content {
             display: block;
         }
 
@@ -55,32 +56,12 @@
         #post-content {
             display: none;
         }
-        .tweet-input:focus {
-        outline: none; /* Remove the default focus outline */
-        border-color: transparent; /* Hide the border when focused */
-    }
+
         /* Example styling for each tab */
-        .tweet {
-            background-color: white;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        .tweet-input:focus {
+            outline: none; /* Remove the default focus outline */
+            border-color: transparent; /* Hide the border when focused */
         }
-
-        .tweet p {
-            margin: 0;
-        }
-
-        .tweet-author {
-            font-weight: bold;
-        }
-
-        .tweet-content {
-            margin-top: 5px;
-        }
-
-        /* Add more styles as needed */
 
         .user-info {
             position: fixed;
@@ -102,41 +83,97 @@
             margin-right: 10px;
         }
 
+        .user-name {
+            display: none; /* Hide on mobile */
+        }
+
         .news-feed {
             position: fixed;
             top: 50px;
-            right: 100px;
-            width: 120px; /* Adjust width as needed */
+            right: 20px; /* Adjust position for mobile */
+            width: 100px; /* Adjust width for mobile */
             display: flex;
-            flex-direction: column;
-            align-items: flex-end;
+            flex-direction: row; /* Make feed and news horizontal */
+            justify-content: space-between; /* Add space between feed and news */
             padding: 10px;
             background-color: #f5f8fa; /* Expand background */
         }
 
         .news-feed .tab {
-            width: 200px;
+            width: calc(50% - 5px); /* Adjust width for mobile and add margin */
+            text-align: center; /* Center text */
+        }
+
+        #tweet-section {
+            text-align: center; /* Center tweet section */
+        }
+
+        #tweet-text {
+            width: calc(100% - 80px); /* Adjust width for mobile */
+            margin-right: 10px; /* Add margin for button */
+        }
+
+        #tweet-section button {
+            padding: 10px; /* Adjust padding for button */
+            width: 80px; /* Adjust width for mobile */
+            background-color: #1da1f2; /* Button color */
+            color: white; /* Button text color */
+            border: none; /* Remove button border */
+            border-radius: 5px; /* Add button border radius */
+        }
+
+        .text-item {
+            background-color: #ffffff; /* White background */
+            border: 1px solid #cccccc; /* Gray border */
+            border-radius: 5px; /* Rounded corners */
+            padding: 10px; /* Add padding */
+            margin-bottom: 10px; /* Add space between text items */
+        }
+
+        .interaction-section {
+            margin-top: 10px;
+            display: flex;
+            margin-left: 10px;
+        }
+
+        .interaction-section a {
+            margin: 0 10px;
+        }
+
+        .text-item p {
+            margin: 0; /* Remove default paragraph margin */
+        }
+
+        .text-content {
+            font-size: 16px; /* Set font size */
+            color: #333333; /* Dark text color */
+        }
+
+        .posted-on {
+            font-size: 12px; /* Set font size */
+            color: #999999; /* Light text color */
         }
     </style>
 </head>
 <body>
-    <nav>
-        <a href="#home" class="tab active" onclick="openTab('home')"><i class="fas fa-home"></i></a>
-        <a href="#explore" class="tab" onclick="openTab('explore')"><i class="fas fa-compass"></i></a>
-        <a href="#notifications" class="tab" onclick="openTab('notifications')"><i class="fas fa-bell"></i></a>
-        <a href="#messages" class="tab" onclick="openTab('messages')"><i class="fas fa-envelope"></i></a>
-        <a href="#profile" class="tab" onclick="openTab('profile')"><i class="fas fa-user"></i></a>
-        <a href="#post" class="tab" onclick="openTab('post')"><i class="fas fa-pencil-alt"></i></a>
-        <a href="#logout" class="tab logout" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i></a>
-        <a href="#settings" class="tab settings" onclick="openSettings()"><i class="fas fa-cog"></i></a>
-    </nav>
+<nav>
+    <a href="#home" class="tab active" onclick="openTab('home')"><i class="fas fa-home"></i></a>
+    <a href="#explore" class="tab" onclick="openTab('explore')"><i class="fas fa-compass"></i></a>
+    <a href="#notifications" class="tab" onclick="openTab('notifications')"><i class="fas fa-bell"></i></a>
+    <a href="#messages" class="tab" onclick="openTab('messages')"><i class="fas fa-envelope"></i></a>
+    <a href="#profile" class="tab" onclick="openTab('profile')"><i class="fas fa-user"></i></a>
+    <a href="#post" class="tab" onclick="openTab('post')"><i class="fas fa-pencil-alt"></i></a>
+    <a href="#logout" class="tab logout" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i></a>
+    <a href="#settings" class="tab settings" onclick="openSettings()"><i class="fas fa-cog"></i></a>
+</nav>
 <div class="user-info">
     <a href="#profile" class="user-icon">
-        {{ fullname|initials }} <!-- Display user's initials dynamically -->
+        {% if current_user %}
+            {{ current_user.fullname|initials }} <!-- Display user's initials dynamically -->
+        {% endif %}
     </a>
-    <span>{{ user_name }}</span> <!-- Display user's name dynamically -->
+    <span class="user-name">{{ user_name }}</span> <!-- Display user's name dynamically -->
 </div>
-
 
 <div class="news-feed">
     <a href="#feed" class="tab" onclick="openTab('feed')">Feed</a>
@@ -145,7 +182,17 @@
 
 <div class="content" id="home-content">
     <h2>Home</h2>
-    <!-- Home content goes here -->
+    {% for post in posts %}
+        <div class="text-item" style="max-width: 600px; border: none">
+            <p class="posted-on"><a href="{{ post.user.profile_url }}" style="text-decoration: none;">{{ post.user.fullname }}</a> - {{ post.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+            <p>{{ post.text }}</p>
+            <div class="interaction-section">
+                <a href="/like/{{ post.id }}"><i class="fas fa-thumbs-up like-icon"></i></a> <!-- Like icon -->
+                <a href="/comment/{{ post.id }}"><i class="fas fa-comment comment-icon"></i></a> <!-- Comment icon -->
+                <a href="/repost/{{ post.id }}"><i class="fas fa-retweet repost-icon"></i></a> <!-- Repost icon -->
+            </div>
+        </div>
+    {% endfor %}
 </div>
 
 <div class="content" id="explore-content">
@@ -170,14 +217,12 @@
 
 <div class="content" id="post-content">
     <h2>Post</h2>
-    <div id="tweet-section" style="display: none; text-align: center; width: 500px;">
-        <!-- Use a single-line input instead of a textarea -->
-        <div style="display: flex; align-items: center;">
-            <textarea id="tweet-text" class="tweet-input" placeholder="Write your tweet here..." style="flex: 1; padding: 10px; border: none; background: none; border-bottom: 1px solid black; resize: none;"></textarea>
-            <button onclick="postTweet()" style="padding: 10px; margin-left: 10px;">Post</button>
-        </div>
-        
-        
+    <div id="tweet-section">
+        <form action="/post" method="post">
+            <textarea id="tweet-text" class="tweet-input" name="text" placeholder="Write your text here..." rows="4" style="padding: 10px; border: 1px solid #ccc; border-radius: 5px; width: 100%; margin-bottom: 10px;"></textarea>
+            <input type="hidden" name="user_id" value="{{ current_user.id }}">
+            <button type="submit" style="padding: 10px; width: 100%; background-color: #1da1f2; color: white; border: none; border-radius: 5px;">Post</button>
+        </form>
     </div>
 </div>
 
@@ -202,19 +247,9 @@
 
     function confirmLogout() {
         if (confirm("Do you want to sign out?")) {
-            // If user confirms, redirect to the home page
-            window.location.href = "/"; // Change the URL to the home page URL
+            window.location.href = "/";
         }
     }
-    function adjustTextAreaHeight() {
-       var textArea = document.getElementById("tweet-text");
-       textArea.style.height = "auto";
-       textArea.style.height = textArea.scrollHeight + "px";
-    }
-
-// Adjust textarea height on input
-   document.getElementById("tweet-text").addEventListener("input", adjustTextAreaHeight);
-
 </script>
 </body>
 </html>
