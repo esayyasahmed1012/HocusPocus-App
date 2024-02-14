@@ -55,7 +55,10 @@
         #post-content {
             display: none;
         }
-
+        .tweet-input:focus {
+        outline: none; /* Remove the default focus outline */
+        border-color: transparent; /* Hide the border when focused */
+    }
         /* Example styling for each tab */
         .tweet {
             background-color: white;
@@ -117,21 +120,23 @@
     </style>
 </head>
 <body>
-
-<nav>
-    <a href="#home" class="tab active" onclick="openTab('home')"><i class="fas fa-home"></i></a>
-    <a href="#explore" class="tab" onclick="openTab('explore')"><i class="fas fa-compass"></i></a>
-    <a href="#notifications" class="tab" onclick="openTab('notifications')"><i class="fas fa-bell"></i></a>
-    <a href="#messages" class="tab" onclick="openTab('messages')"><i class="fas fa-envelope"></i></a>
-    <a href="#profile" class="tab" onclick="openTab('profile')"><i class="fas fa-user"></i></a>
-    <a href="#post" class="tab" onclick="openTab('post')"><i class="fas fa-pencil-alt"></i></a>
-    <a href="#settings" class="tab settings" onclick="openSettings()"><i class="fas fa-cog"></i></a>
-</nav>
-
+    <nav>
+        <a href="#home" class="tab active" onclick="openTab('home')"><i class="fas fa-home"></i></a>
+        <a href="#explore" class="tab" onclick="openTab('explore')"><i class="fas fa-compass"></i></a>
+        <a href="#notifications" class="tab" onclick="openTab('notifications')"><i class="fas fa-bell"></i></a>
+        <a href="#messages" class="tab" onclick="openTab('messages')"><i class="fas fa-envelope"></i></a>
+        <a href="#profile" class="tab" onclick="openTab('profile')"><i class="fas fa-user"></i></a>
+        <a href="#post" class="tab" onclick="openTab('post')"><i class="fas fa-pencil-alt"></i></a>
+        <a href="#logout" class="tab logout" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i></a>
+        <a href="#settings" class="tab settings" onclick="openSettings()"><i class="fas fa-cog"></i></a>
+    </nav>
 <div class="user-info">
-    <div class="user-icon">E</div> <!-- Encircled E -->
+    <a href="#profile" class="user-icon">
+        {{ fullname|initials }} <!-- Display user's initials dynamically -->
+    </a>
     <span>{{ user_name }}</span> <!-- Display user's name dynamically -->
 </div>
+
 
 <div class="news-feed">
     <a href="#feed" class="tab" onclick="openTab('feed')">Feed</a>
@@ -165,7 +170,15 @@
 
 <div class="content" id="post-content">
     <h2>Post</h2>
-    <!-- Post content goes here -->
+    <div id="tweet-section" style="display: none; text-align: center; width: 500px;">
+        <!-- Use a single-line input instead of a textarea -->
+        <div style="display: flex; align-items: center;">
+            <textarea id="tweet-text" class="tweet-input" placeholder="Write your tweet here..." style="flex: 1; padding: 10px; border: none; background: none; border-bottom: 1px solid black; resize: none;"></textarea>
+            <button onclick="postTweet()" style="padding: 10px; margin-left: 10px;">Post</button>
+        </div>
+        
+        
+    </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
@@ -182,7 +195,26 @@
         }
         document.getElementById(tabName + "-content").style.display = "block";
         document.querySelector('a[href="#' + tabName + '"]').classList.add("active");
+        if (tabName === 'post') {
+            document.getElementById("tweet-section").style.display = "block";
+        }
     }
+
+    function confirmLogout() {
+        if (confirm("Do you want to sign out?")) {
+            // If user confirms, redirect to the home page
+            window.location.href = "/"; // Change the URL to the home page URL
+        }
+    }
+    function adjustTextAreaHeight() {
+       var textArea = document.getElementById("tweet-text");
+       textArea.style.height = "auto";
+       textArea.style.height = textArea.scrollHeight + "px";
+    }
+
+// Adjust textarea height on input
+   document.getElementById("tweet-text").addEventListener("input", adjustTextAreaHeight);
+
 </script>
 </body>
 </html>
