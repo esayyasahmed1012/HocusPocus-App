@@ -160,7 +160,7 @@
     <a href="#home" class="tab active" onclick="openTab('home')"><i class="fas fa-home"></i></a>
     <a href="#explore" class="tab" onclick="openTab('explore')"><i class="fas fa-compass"></i></a>
     <a href="#notifications" class="tab" onclick="openTab('notifications')"><i class="fas fa-bell"></i></a>
-    <a href="#messages" class="tab" onclick="openTab('messages')"><i class="fas fa-envelope"></i></a>
+    <a href="#messages" class="tab" onclick="openTab('messages'); openComposeMessageModal();"><i class="fas fa-envelope"></i></a>
     <a href="#profile" class="tab" onclick="openTab('profile')"><i class="fas fa-user"></i></a>
     <a href="#post" class="tab" onclick="openTab('post')"><i class="fas fa-pencil-alt"></i></a>
     <a href="#logout" class="tab logout" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i></a>
@@ -183,16 +183,19 @@
 <div class="content" id="home-content">
     <h2>Home</h2>
     {% for post in posts %}
-        <div class="text-item" style="max-width: 600px; border: none">
-            <p class="posted-on"><a href="{{ post.user.profile_url }}" style="text-decoration: none;">{{ post.user.fullname }}</a> - {{ post.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
-            <p>{{ post.text }}</p>
-            <div class="interaction-section">
-                <a href="/like/{{ post.id }}"><i class="fas fa-thumbs-up like-icon"></i></a> <!-- Like icon -->
-                <a href="/comment/{{ post.id }}"><i class="fas fa-comment comment-icon"></i></a> <!-- Comment icon -->
-                <a href="/repost/{{ post.id }}"><i class="fas fa-retweet repost-icon"></i></a> <!-- Repost icon -->
-            </div>
-        </div>
-    {% endfor %}
+    <div class="text-item" style="max-width: 600px; border: none">
+    <p class="posted-on"><a href="{{ post.user.profile_url }}" style="text-decoration: none;">{{ post.user.fullname }}</a> - {{ post.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+    <p>{{ post.text }}</p>
+    <div class="interaction-section">
+        <a href="#" onclick="toggleLike('{{ post.id }}', this)"><i class="fas fa-thumbs-up like-icon {% if post.user_has_liked %}liked{% endif %}"></i></a> <!-- Like icon -->
+        <span class="like-count">{{ post.like_count }}</span> <!-- Display like count -->
+        <a href="/comment/{{ post.id }}"><i class="fas fa-comment comment-icon"></i></a> <!-- Comment icon -->
+        <a href="/repost/{{ post.id }}"><i class="fas fa-retweet repost-icon"></i></a> <!-- Repost icon -->
+    </div>
+ </div>
+{% endfor %}
+
+
 </div>
 
 <div class="content" id="explore-content">
@@ -207,11 +210,25 @@
 
 <div class="content" id="messages-content">
     <h2>Messages</h2>
-    <!-- Messages content goes here -->
+    
 </div>
 
 <div class="content" id="profile-content">
     <h2>Profile</h2>
+    <div class="content" id="messages-content">
+        <!-- Messages content -->
+    
+        <!-- Compose message button -->
+        <a href="#messages" class="tab" onclick="openTab('messages'); openComposeMessageModal();"><i class="fas fa-envelope"></i></a>
+    
+        <!-- Message section -->
+        <div class="message-section" id="message-section" style="display: none;">
+            <input type="text" id="search-user" placeholder="Search username...">
+            <button onclick="searchUser()"><i class="fas fa-search"></i></button>
+            <textarea id="message-text" placeholder="Enter your message..."></textarea>
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
     <!-- Profile content goes here -->
 </div>
 
@@ -250,6 +267,51 @@
             window.location.href = "/";
         }
     }
+    function toggleLike(postId, likeButton) {
+        var isLiked = likeButton.classList.contains('liked');
+    
+        fetch(`/like/${postId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ isLiked: isLiked })
+        }).then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error('Failed to toggle like');
+            }
+        }).then(data => {
+            var likeCountElement = likeButton.nextElementSibling;
+            likeCountElement.textContent = data.like_count;
+            if (data.is_liked) {
+                likeButton.classList.add('liked');
+            } else {
+                likeButton.classList.remove('liked');
+            }
+        }).catch(error => {
+            console.error('Error toggling like:', error);
+        });
+    }
+    function openComposeMessageModal() {
+    // Assuming you have a modal with id="compose-message-modal"
+        document.getElementById('compose-message-modal').style.display = 'block';
+    }
+    function openComposeMessageModal() {
+        var messageSection = document.getElementById("message-section");
+        messageSection.style.display = "block"; // Display the message section
+   }
+
+function searchUser() {
+    var searchUserInput = document.getElementById("search-user").value;
+    // Logic to search for user from Flask app goes here
+}
+
+function sendMessage() {
+    var messageText = document.getElementById("message-text").value;
+    // Logic to send the message goes here
+}
 </script>
 </body>
 </html>
