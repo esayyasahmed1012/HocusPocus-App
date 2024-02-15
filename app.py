@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, render_template, url_for, render_template_string
+from flask import Flask,flash, request, redirect, render_template, url_for, render_template_string, jsonify
 from flask_login import LoginManager, login_user, logout_user, current_user, login_required, UserMixin
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
@@ -15,13 +15,42 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 login_manager = LoginManager(app)
-class TextModel(db.Model):
+class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    text = db.Column(db.String(200000), nullable=False)
+    sender_id = db.Column(db.Integer, db.ForeignKey('user_model.id'), nullable=False)
+    recipient_id = db.Column(db.Integer, db.ForeignKey('user_model.id'), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+class LikeModel(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    post_id = db.Column(db.Integer, db.ForeignKey('text_model.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user_model.id'), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    # Define a relationship with the UserModel
+    post = db.relationship('TextModel', backref='likes', lazy=True)
+    user = db.relationship('UserModel', backref='likes', lazy=True)
+class CommentModel(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    post_id = db.Column(db.Integer, db.ForeignKey('text_model.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user_model.id'), nullable=False)
+    text = db.Column(db.String(2000), nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    post = db.relationship('TextModel', backref='comments', lazy=True)
+    user = db.relationship('UserModel', backref='comments', lazy=True)
+class RepostModel(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    post_id = db.Column(db.Integer, db.ForeignKey('text_model.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user_model.id'), nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    post = db.relationship('TextModel', backref='reposts', lazy=True)
+    user = db.relationship('UserModel', backref='reposts', lazy=True)
+class TextModel(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    text = db.Column(db.String(2000), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user_model.id'), nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     user = db.relationship('UserModel', backref='texts', lazy=True)
+    like_count = db.Column(db.Integer, default=0)  # Add like_count attribute
 
 class UserModel(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -47,6 +76,7 @@ class User(UserMixin):
 def load_user(user_id):
     return UserModel.query.get(user_id)
 
+        
 @app.route("/post", methods=["POST"])
 def post_text():
     if request.method == "POST":
@@ -57,11 +87,24 @@ def post_text():
         new_text = TextModel(text=text_content, user_id=user_id, created_at=datetime.utcnow())
         db.session.add(new_text)
         db.session.commit()
-
-        # Redirect the user back to the home page
         return redirect(url_for("dashboard"))
 
+@app.route("/like/<int:post_id>", methods=["POST"])
+def like_post(post_id):
+    is_liked = request.json.get('isLiked')
+    post = TextModel.query.get_or_404(post_id)
 
+    if is_liked:
+        post.like_count -= 1
+    else:
+        post.like_count += 1
+
+    db.session.commit()
+
+    return jsonify({
+        'like_count': post.like_count,
+        'is_liked': not is_liked
+    })
 @app.route("/register", methods=["POST", "GET"])
 def register():
     if request.method == "POST":
