@@ -1,12 +1,22 @@
 from flask import Flask,flash, request, redirect, render_template, url_for, render_template_string, jsonify
 from flask_login import LoginManager, login_user, logout_user, current_user, login_required, UserMixin
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.utils import secure_filename
 from sqlalchemy.exc import IntegrityError
 from datetime import datetime
 import bcrypt
 import os
 
+UPLOAD_FOLDER = 'C:\\Users\\Administrator\\Desktop\\desktop'
+
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+
 app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Create upload folder if it doesn't exist
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 app.config['SECRET_KEY']='efaf54030445f83f13a6732ee4b88c38'
 # app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DEV_DATABASE_URI')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:Xas#123ad@localhost/my_storage'
@@ -15,6 +25,11 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 login_manager = LoginManager(app)
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     sender_id = db.Column(db.Integer, db.ForeignKey('user_model.id'), nullable=False)
@@ -58,13 +73,44 @@ class UserModel(UserMixin, db.Model):
     fullname = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(100), nullable=False)
-    
+    profile_picture_url = db.Column(db.String(200), nullable=True)
 
     def __init__(self, username, fullname, email, password):
         self.username = username
         self.fullname = fullname
         self.email = email
         self.password = password
+@app.route('/upload_profile_picture', methods=['POST'])
+@login_required
+def upload_profile_picture():
+    if 'file' not in request.files:
+        flash('No file part')
+        return redirect(request.url)
+
+    file = request.files['file']
+    if file.filename == '':
+        flash('No selected file')
+        return redirect(request.url)
+
+    if file and allowed_file(file.filename):
+        # Save the file to a temporary location
+        filename = secure_filename(file.filename)
+        file_path = os.path.join(app.root_path, 'uploads', filename)  # Adjusted file path
+        file.save(file_path)
+
+        # Update profile picture URL for the current user
+        current_user.profile_picture_url = file_path
+        db.session.commit()
+
+        # Return a success message
+        flash('Profile picture updated successfully')
+        return redirect(url_for('dashboard'))
+
+    # Handle invalid file types
+    flash('Invalid file type')
+    return redirect(request.url)
+
+
 
 # Example User model
 class User(UserMixin):
