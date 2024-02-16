@@ -168,12 +168,15 @@
 </nav>
 <div class="user-info">
     <a href="#profile" class="user-icon">
-        {% if current_user %}
-            {{ current_user.fullname|initials }} <!-- Display user's initials dynamically -->
+        {% if current_user.profile_picture_url %}
+            <img src="{{ current_user.profile_picture_url }}" alt="User Profile Picture">
+        {% else %}
+            {{ current_user.fullname|initials }}
         {% endif %}
     </a>
-    <span class="user-name">{{ user_name }}</span> <!-- Display user's name dynamically -->
+    <span class="user-name">{{ current_user.fullname }}</span> <!-- Display user's name dynamically -->
 </div>
+
 
 <div class="news-feed">
     <a href="#feed" class="tab" onclick="openTab('feed')">Feed</a>
@@ -215,22 +218,32 @@
 
 <div class="content" id="profile-content">
     <h2>Profile</h2>
-    <div class="content" id="messages-content">
-        <!-- Messages content -->
-    
-        <!-- Compose message button -->
-        <a href="#messages" class="tab" onclick="openTab('messages'); openComposeMessageModal();"><i class="fas fa-envelope"></i></a>
-    
-        <!-- Message section -->
-        <div class="message-section" id="message-section" style="display: none;">
-            <input type="text" id="search-user" placeholder="Search username...">
-            <button onclick="searchUser()"><i class="fas fa-search"></i></button>
-            <textarea id="message-text" placeholder="Enter your message..."></textarea>
-            <button onclick="sendMessage()">Send</button>
-        </div>
+    <!-- Inside the profile section -->
+    <!-- Inside the profile section -->
+    <div class="profile-picture-section">
+        <form id="upload-form" action="/upload_profile_picture" method="post" enctype="multipart/form-data">
+            <input type="file" name="file" id="profile-picture-input" accept="image/*">
+            <button type="submit">Upload Picture</button>
+        </form>
     </div>
-    <!-- Profile content goes here -->
+    
+
 </div>
+
+<div class="user-info">
+    <a href="#profile" class="user-icon">
+        {% if current_user.profile_picture_url %}
+            <img src="{{ current_user.profile_picture_url }}" alt="User Profile Picture">
+        {% else %}
+            {{ current_user.fullname|initials }}
+        {% endif %}
+    </a>
+    <span class="user-name">{{ current_user.fullname }}</span> <!-- Display user's name dynamically -->
+</div>
+
+    
+    <!-- Profile content goes here -->
+
 
 <div class="content" id="post-content">
     <h2>Post</h2>
@@ -312,6 +325,32 @@ function sendMessage() {
     var messageText = document.getElementById("message-text").value;
     // Logic to send the message goes here
 }
+// JavaScript function to handle profile picture uploads
+function uploadProfilePicture() {
+    var input = document.getElementById('profile-picture-input');
+    var file = input.files[0];
+
+    var formData = new FormData();
+    formData.append('file', file);
+
+    fetch('/upload_profile_picture', {
+        method: 'POST',
+        body: formData
+    }).then(response => {
+        if (response.ok) {
+            return response.json();
+        } else {
+            throw new Error('Failed to upload profile picture');
+        }
+    }).then(data => {
+        // Update the profile picture preview
+        document.getElementById('profile-picture-preview').src = data.profile_picture_url;
+        document.getElementById('profile-picture-preview').style.display = 'block';
+    }).catch(error => {
+        console.error('Error uploading profile picture:', error);
+    });
+}
+
 </script>
 </body>
 </html>
