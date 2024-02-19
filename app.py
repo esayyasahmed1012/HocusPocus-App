@@ -7,8 +7,7 @@ from datetime import datetime
 import bcrypt
 import os
 
-UPLOAD_FOLDER = 'C:\\Users\\Administrator\\Desktop\\desktop'
-
+UPLOAD_FOLDER = 'static\\profile_pics'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 
@@ -93,9 +92,9 @@ def upload_profile_picture():
         return redirect(request.url)
 
     if file and allowed_file(file.filename):
-        # Save the file to a temporary location
+        # Save the file to the upload folder
         filename = secure_filename(file.filename)
-        file_path = os.path.join(app.root_path, 'uploads', filename)  # Adjusted file path
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(file_path)
 
         # Update profile picture URL for the current user
@@ -109,7 +108,6 @@ def upload_profile_picture():
     # Handle invalid file types
     flash('Invalid file type')
     return redirect(request.url)
-
 
 
 # Example User model
@@ -186,7 +184,13 @@ def register():
                     return render_template('register.html', error_message=error_message)
 
     return render_template("register.html")
-
+app.route('/user_profile/<username>')
+def user_profile(username):
+    user_profile_picture = "/path/to/profile/picture"  # Replace with actual URL or path
+    email = request.form.get('email')
+    user = UserModel.query.filter_by(email=email).first()
+    fullname=user.fullname;
+    return render_template('user_profile.html', user_profile_picture=user_profile_picture, fullname=fullname)
     
 
 @app.route("/", methods=["GET", "POST"])
