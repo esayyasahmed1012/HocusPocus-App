@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Twitter</title>
+    <title>Hocus Pocus</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         body {
@@ -86,6 +86,32 @@
         .user-name {
             display: none; /* Hide on mobile */
         }
+        .profile-picture {
+            width: 40px; /* Adjust as needed */
+            height: 40px; /* Adjust as needed */
+            overflow: hidden; /* Hide overflow */
+            border-radius: 50%; /* Make it circular */
+            background-color: transparent; /* Background color for initials */
+            color: white; /* Text color for initials */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .profile-picture img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%; /* Make it circular */
+            border: none; /* Remove border */
+        }
+        
+        
+        
+        .initials {
+            font-size: 20px; /* Adjust font size as needed */
+        }
+        
 
         .news-feed {
             position: fixed;
@@ -169,15 +195,15 @@
 <div class="user-info">
     <a href="#profile" class="user-icon">
         {% if current_user.profile_picture_url %}
-            <img src="{{ current_user.profile_picture_url }}" alt="User Profile Picture">
+            <div class="profile-picture">
+                <img src="{{ url_for('static', filename=current_user.profile_picture_url) }}" alt="Profile Picture">
+            </div>
         {% else %}
-            {{ current_user.fullname|initials }}
+            <div class="profile-picture initials">{{ current_user.fullname|initials }}</div>
         {% endif %}
     </a>
     <span class="user-name">{{ current_user.fullname }}</span> <!-- Display user's name dynamically -->
 </div>
-
-
 <div class="news-feed">
     <a href="#feed" class="tab" onclick="openTab('feed')">Feed</a>
     <a href="#news" class="tab" onclick="openTab('news')">News</a>
@@ -217,31 +243,29 @@
 </div>
 
 <div class="content" id="profile-content">
-    <h2>Profile</h2>
-    <!-- Inside the profile section -->
-    <!-- Inside the profile section -->
+    <!-- Profile content -->
     <div class="profile-picture-section">
         <form id="upload-form" action="/upload_profile_picture" method="post" enctype="multipart/form-data">
             <input type="file" name="file" id="profile-picture-input" accept="image/*">
             <button type="submit">Upload Picture</button>
         </form>
     </div>
-    
-
 </div>
 
 <div class="user-info">
     <a href="#profile" class="user-icon">
         {% if current_user.profile_picture_url %}
-            <img src="{{ current_user.profile_picture_url }}" alt="User Profile Picture">
+            <div class="profile-picture">
+                <img src="{{ current_user.profile_picture_url }}" alt="Profile Picture" style="width: 40px; height: 40px; border-radius: 50%;">
+            </div>
         {% else %}
-            {{ current_user.fullname|initials }}
+            <div class="profile-picture initials">{{ current_user.fullname|initials }}</div>
         {% endif %}
     </a>
     <span class="user-name">{{ current_user.fullname }}</span> <!-- Display user's name dynamically -->
 </div>
 
-    
+ 
     <!-- Profile content goes here -->
 
 
