@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <!-- Link to your external CSS file -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>User Profile</h1>
+        <div class="profile">
+            {% if profile_picture_url %}
+                <img src="{{ profile_picture_url }}" alt="Profile Picture" class="profile-picture">
+            {% else %}
+                <div class="profile-initials">{{ get_initials(fullname) }}</div>
+            {% endif %}
+            <h2>{{ fullname }}</h2>
+            <a href="#" id="follow-button">Follow</a>
+            <div id="message-section">
+                <!-- Message section goes here -->
+            </div>
+        </div>
+    </div>
+</body>
+</html>

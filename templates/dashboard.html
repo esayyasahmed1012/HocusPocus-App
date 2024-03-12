@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hocus Pocus</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f8fa;
+        }
+
+        nav {
+            background-color: #f5f8fa;
+            padding: 10px;
+            width: 80px; /* Adjust width for mobile */
+            position: fixed;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .tab {
+            display: block;
+            margin-bottom: 10px;
+            padding: 10px;
+            text-align: center;
+            background-color: white;
+            color: #1da1f2;
+            text-decoration: none;
+            border-left: 4px solid transparent;
+        }
+
+        .tab.active {
+            border-left: 4px solid #1da1f2;
+        }
+
+        .content {
+            margin-left: 100px; /* Adjust as needed to match nav width */
+            padding: 20px;
+        }
+
+        /* Example styles for different tabs */
+        #home-content,
+        #feed-content,
+        #news-content {
+            display: block;
+        }
+
+        #explore-content,
+        #notifications-content,
+        #messages-content,
+        #profile-content,
+        #post-content {
+            display: none;
+        }
+
+        /* Example styling for each tab */
+        .tweet-input:focus {
+            outline: none; /* Remove the default focus outline */
+            border-color: transparent; /* Hide the border when focused */
+        }
+
+        .user-info {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .user-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #1da1f2;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 10px;
+        }
+
+        .user-name {
+            display: none; /* Hide on mobile */
+        }
+        .profile-picture {
+            width: 40px; /* Adjust as needed */
+            height: 40px; /* Adjust as needed */
+            overflow: hidden; /* Hide overflow */
+            border-radius: 50%; /* Make it circular */
+            background-color: transparent; /* Background color for initials */
+            color: white; /* Text color for initials */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .profile-picture img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%; /* Make it circular */
+            border: none; /* Remove border */
+        }
+        
+        
+        
+        .initials {
+            font-size: 20px; /* Adjust font size as needed */
+        }
+        
+
+        .news-feed {
+            position: fixed;
+            top: 50px;
+            right: 20px; /* Adjust position for mobile */
+            width: 100px; /* Adjust width for mobile */
+            display: flex;
+            flex-direction: row; /* Make feed and news horizontal */
+            justify-content: space-between; /* Add space between feed and news */
+            padding: 10px;
+            background-color: #f5f8fa; /* Expand background */
+        }
+
+        .news-feed .tab {
+            width: calc(50% - 5px); /* Adjust width for mobile and add margin */
+            text-align: center; /* Center text */
+        }
+
+        #tweet-section {
+            text-align: center; /* Center tweet section */
+        }
+
+        #tweet-text {
+            width: calc(100% - 80px); /* Adjust width for mobile */
+            margin-right: 10px; /* Add margin for button */
+        }
+
+        #tweet-section button {
+            padding: 10px; /* Adjust padding for button */
+            width: 80px; /* Adjust width for mobile */
+            background-color: #1da1f2; /* Button color */
+            color: white; /* Button text color */
+            border: none; /* Remove button border */
+            border-radius: 5px; /* Add button border radius */
+        }
+
+        .text-item {
+            background-color: #ffffff; /* White background */
+            border: 1px solid #cccccc; /* Gray border */
+            border-radius: 5px; /* Rounded corners */
+            padding: 10px; /* Add padding */
+            margin-bottom: 10px; /* Add space between text items */
+        }
+
+        .interaction-section {
+            margin-top: 10px;
+            display: flex;
+            margin-left: 10px;
+        }
+
+        .interaction-section a {
+            margin: 0 10px;
+        }
+
+        .text-item p {
+            margin: 0; /* Remove default paragraph margin */
+        }
+
+        .text-content {
+            font-size: 16px; /* Set font size */
+            color: #333333; /* Dark text color */
+        }
+
+        .posted-on {
+            font-size: 12px; /* Set font size */
+            color: #999999; /* Light text color */
+        }
+    </style>
+</head>
+<body>
+<nav>
+    <a href="#home" class="tab active" onclick="openTab('home')"><i class="fas fa-home"></i></a>
+    <a href="#explore" class="tab" onclick="openTab('explore')"><i class="fas fa-compass"></i></a>
+    <a href="#notifications" class="tab" onclick="openTab('notifications')"><i class="fas fa-bell"></i></a>
+    <a href="#messages" class="tab" onclick="openTab('messages'); openComposeMessageModal();"><i class="fas fa-envelope"></i></a>
+    <a href="#profile" class="tab" onclick="openTab('profile')"><i class="fas fa-user"></i></a>
+    <a href="#post" class="tab" onclick="openTab('post')"><i class="fas fa-pencil-alt"></i></a>
+    <a href="#logout" class="tab logout" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i></a>
+    <a href="#settings" class="tab settings" onclick="openSettings()"><i class="fas fa-cog"></i></a>
+</nav>
+<div class="user-info">
+    <a href="#profile" class="user-icon">
+        {% if current_user.profile_picture_url %}
+            <div class="profile-picture">
+                <img src="{{ url_for('static', filename=current_user.profile_picture_url) }}" alt="Profile Picture">
+            </div>
+        {% else %}
+            <div class="profile-picture initials">{{ current_user.fullname|initials }}</div>
+        {% endif %}
+    </a>
+    <span class="user-name">{{ current_user.fullname }}</span> <!-- Display user's name dynamically -->
+</div>
+<div class="news-feed">
+    <a href="#feed" class="tab" onclick="openTab('feed')">Feed</a>
+    <a href="#news" class="tab" onclick="openTab('news')">News</a>
+</div>
+
+<div class="content" id="home-content">
+    <h2>Home</h2>
+    {% for post in posts %}
+    <div class="text-item" style="max-width: 600px; border: none">
+    <p class="posted-on"><a href="{{ post.user.profile_url }}" style="text-decoration: none;">{{ post.user.fullname }}</a> - {{ post.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+    <p>{{ post.text }}</p>
+    <div class="interaction-section">
+        <a href="#" onclick="toggleLike('{{ post.id }}', this)"><i class="fas fa-thumbs-up like-icon {% if post.user_has_liked %}liked{% endif %}"></i></a> <!-- Like icon -->
+        <span class="like-count">{{ post.like_count }}</span> <!-- Display like count -->
+        <a href="/comment/{{ post.id }}"><i class="fas fa-comment comment-icon"></i></a> <!-- Comment icon -->
+        <a href="/repost/{{ post.id }}"><i class="fas fa-retweet repost-icon"></i></a> <!-- Repost icon -->
+    </div>
+ </div>
+{% endfor %}
+
+
+</div>
+
+<div class="content" id="explore-content">
+    <h2>Explore</h2>
+    <!-- Explore content goes here -->
+</div>
+
+<div class="content" id="notifications-content">
+    <h2>Notifications</h2>
+    <!-- Notifications content goes here -->
+</div>
+
+<div class="content" id="messages-content">
+    <h2>Messages</h2>
+    
+</div>
+
+<div class="content" id="profile-content">
+    <!-- Profile content -->
+    <div class="profile-picture-section">
+        <form id="upload-form" action="/upload_profile_picture" method="post" enctype="multipart/form-data">
+            <input type="file" name="file" id="profile-picture-input" accept="image/*">
+            <button type="submit">Upload Picture</button>
+        </form>
+    </div>
+</div>
+
+<div class="user-info">
+    <a href="#profile" class="user-icon">
+        {% if current_user.profile_picture_url %}
+            <div class="profile-picture">
+                <img src="{{ current_user.profile_picture_url }}" alt="Profile Picture" style="width: 40px; height: 40px; border-radius: 50%;">
+            </div>
+        {% else %}
+            <div class="profile-picture initials">{{ current_user.fullname|initials }}</div>
+        {% endif %}
+    </a>
+    <span class="user-name">{{ current_user.fullname }}</span> <!-- Display user's name dynamically -->
+</div>
+
+ 
+    <!-- Profile content goes here -->
+
+
+<div class="content" id="post-content">
+    <h2>Post</h2>
+    <div id="tweet-section">
+        <form action="/post" method="post">
+            <textarea id="tweet-text" class="tweet-input" name="text" placeholder="Write your text here..." rows="4" style="padding: 10px; border: 1px solid #ccc; border-radius: 5px; width: 100%; margin-bottom: 10px;"></textarea>
+            <input type="hidden" name="user_id" value="{{ current_user.id }}">
+            <button type="submit" style="padding: 10px; width: 100%; background-color: #1da1f2; color: white; border: none; border-radius: 5px;">Post</button>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+<script>
+    function openTab(tabName) {
+        var i, tabContent, tabLinks;
+        tabContent = document.getElementsByClassName("content");
+        for (i = 0; i < tabContent.length; i++) {
+            tabContent[i].style.display = "none";
+        }
+        tabLinks = document.getElementsByClassName("tab");
+        for (i = 0; i < tabLinks.length; i++) {
+            tabLinks[i].classList.remove("active");
+        }
+        document.getElementById(tabName + "-content").style.display = "block";
+        document.querySelector('a[href="#' + tabName + '"]').classList.add("active");
+        if (tabName === 'post') {
+            document.getElementById("tweet-section").style.display = "block";
+        }
+    }
+
+    function confirmLogout() {
+        if (confirm("Do you want to sign out?")) {
+            window.location.href = "/";
+        }
+    }
+    function toggleLike(postId, likeButton) {
+        var isLiked = likeButton.classList.contains('liked');
+    
+        fetch(`/like/${postId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ isLiked: isLiked })
+        }).then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error('Failed to toggle like');
+            }
+        }).then(data => {
+            var likeCountElement = likeButton.nextElementSibling;
+            likeCountElement.textContent = data.like_count;
+            if (data.is_liked) {
+                likeButton.classList.add('liked');
+            } else {
+                likeButton.classList.remove('liked');
+            }
+        }).catch(error => {
+            console.error('Error toggling like:', error);
+        });
+    }
+    function openComposeMessageModal() {
+    // Assuming you have a modal with id="compose-message-modal"
+        document.getElementById('compose-message-modal').style.display = 'block';
+    }
+    function openComposeMessageModal() {
+        var messageSection = document.getElementById("message-section");
+        messageSection.style.display = "block"; // Display the message section
+   }
+
+function searchUser() {
+    var searchUserInput = document.getElementById("search-user").value;
+    // Logic to search for user from Flask app goes here
+}
+
+function sendMessage() {
+    var messageText = document.getElementById("message-text").value;
+    // Logic to send the message goes here
+}
+// JavaScript function to handle profile picture uploads
+function uploadProfilePicture() {
+    var input = document.getElementById('profile-picture-input');
+    var file = input.files[0];
+
+    var formData = new FormData();
+    formData.append('file', file);
+
+    fetch('/upload_profile_picture', {
+        method: 'POST',
+        body: formData
+    }).then(response => {
+        if (response.ok) {
+            return response.json();
+        } else {
+            throw new Error('Failed to upload profile picture');
+        }
+    }).then(data => {
+        // Update the profile picture preview
+        document.getElementById('profile-picture-preview').src = data.profile_picture_url;
+        document.getElementById('profile-picture-preview').style.display = 'block';
+    }).catch(error => {
+        console.error('Error uploading profile picture:', error);
+    });
+}
+
+</script>
+</body>
+</html>

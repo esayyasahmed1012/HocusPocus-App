@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inbox</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Inbox</h2>
+        <ul class="list-group">
+            {% for message in messages %}
+            <li class="list-group-item">
+                <strong>From: </strong>{{ message.sender.fullname }} ({{ message.sender.username }})
+                <br>
+                <strong>Date: </strong>{{ message.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
+                <br>
+                <strong>Message: </strong>{{ message.content }}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>
