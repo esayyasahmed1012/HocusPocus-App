@@ -16,19 +16,21 @@ header {
     text-align: center;
     margin-bottom: 40px;
 }
-.login-container {
-    width: 300px;
+/* .login-container {
+    max-width: 800px;
     margin: 100px auto;
     background-color: #fff;
     padding: 20px;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-.container {
+} */
+.container , .login-container {
     width: 400px;
     margin: 50px auto;
     background-color: #fff;
     padding: 20px;
+}
+.container{
     border-radius: 8px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
 }
@@ -60,7 +62,7 @@ input[type="password"] {
     flex-basis: 45%;
 }
 .login-section p, .signup-section p{
-    margin-left: 10px;
+    margin-left: 80px;
 }
 button {
     width: 100%;
@@ -125,7 +127,9 @@ main {
     flex-basis: 45%;
 }
 
-
+.text-muted{
+    text-decoration: none;
+}
 
 
 
